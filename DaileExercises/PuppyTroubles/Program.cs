@@ -44,36 +44,17 @@ namespace PuppyTroubles
         }
         static void Main(string[] args)
         {
-            List<int> treats = new List<int>() { 1, 2, 3 };
+            List<int> treats = new List<int>() { 1, 2, 2,3,3,3,4 };
             List<Node> leafList = new List<Node>();
 
-            List<Node> tree = BuildTree(treats, out leafList);
+            List<Node> tree = BuildTree(treats, ref leafList);
 
 
-            int combinations = GetCombinations(treats.Count);
+            List<List<int>> combinationList = GetCombinations(leafList);
             int result = 0;
-            List<int> highestResult = new List<int>();
+            List<int> highestResult = FindHighest(ref result, combinationList);
 
-            //SwapTreats(treats, ref indexToMove);
-            //if(HappinessTotal(treats) > result)
-            //{
-            //    result = HappinessTotal(treats);
-            //    highestResult = treats;
-            //}
-            //indexToMove++;
-
-            //while (combinations > 0)
-            //{
-            //    SwapTreats(treats, ref indexToMove);
-            //    int happy = HappinessTotal(treats);
-
-            //    if (happy > result)
-            //    {
-            //        result = happy;
-            //        highestResult = new List<int>(treats);
-            //    }
-            //    combinations--;
-            //}
+            
 
 
             //Console.WriteLine("the list of treats: " + originalList);
@@ -81,6 +62,23 @@ namespace PuppyTroubles
             Console.WriteLine("highest happiness distribution: " + PrintList(highestResult));
             Console.Read();
 
+        }
+        
+        static List<int> FindHighest(ref int highestResult, List<List<int>> treatCombinations)
+        {
+            highestResult = 0;
+            List<int> resultList = new List<int>();
+            foreach(List<int> combination in treatCombinations)
+            {
+                
+                int total = HappinessTotal(combination);
+                if(total > highestResult)
+                {
+                    highestResult = total;
+                    resultList = new List<int>(combination);
+                }
+            }
+            return resultList;
         }
 
         static string PrintList(List<int> list)
@@ -102,30 +100,19 @@ namespace PuppyTroubles
             {
                 List<int> combination = new List<int>();
                 combination.Add(leaf.Data);
-                Node parent = leaf.Parent;
-                while(parent != null)
+                Node currentNode = leaf.Parent;
+                while(currentNode.Parent != null)
                 {
-                    combination.Add(parent.Data);
-                    parent = parent.Parent;
+                    combination.Insert(0, currentNode.Data);
+                    currentNode = currentNode.Parent;
                 }
-                combinationsList.Add(combination);
+                combinationsList.Insert(0, combination);
             }
             return combinationsList;
 
         }
 
-        static void SwapTreats(List<int> list, ref int indexToMove)
-        {
-            if (indexToMove == list.Count - 1)
-            {
-                indexToMove = 0;
-            }
-            int t = list[indexToMove];
-            list.RemoveAt(indexToMove);
-            list.Insert(++indexToMove, t);
-        }
-
-        static List<Node> BuildTree(List<int> treatsList, out List<Node> leafList)
+        static List<Node> BuildTree(List<int> treatsList, ref List<Node> leafList)
         {
             List<Node> tree = new List<Node>();
 
@@ -204,19 +191,6 @@ namespace PuppyTroubles
         static int HappinessTotal(List<int> treats)
         {
             int result = 0;
-
-            /*
-             
-             if( left > me nad right > me ) 
-                -1
-             
-             if( left < me and right < me ) 
-                +1
-             * 
-             else 0
-             * 
-             *
-             */
 
             for (int i = 0; i < treats.Count; i++)
             {
