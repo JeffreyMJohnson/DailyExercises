@@ -45,8 +45,9 @@ namespace PuppyTroubles
         static void Main(string[] args)
         {
             List<int> treats = new List<int>() { 1, 2, 3 };
+            List<Node> leafList = new List<Node>();
 
-            List<Node> tree = BuildTree(treats);
+            List<Node> tree = BuildTree(treats, out leafList);
 
 
             int combinations = GetCombinations(treats.Count);
@@ -93,9 +94,23 @@ namespace PuppyTroubles
             return result;
         }
 
-        static List<List<int>> GetCombinations(List<Node> tree)
+        static List<List<int>> GetCombinations(List<Node> leafList)
         {
-            List<List<int>> comboList = new List<List<int>>();
+            List<List<int>> combinationsList = new List<List<int>>();
+
+            foreach(Node leaf in leafList)
+            {
+                List<int> combination = new List<int>();
+                combination.Add(leaf.Data);
+                Node parent = leaf.Parent;
+                while(parent != null)
+                {
+                    combination.Add(parent.Data);
+                    parent = parent.Parent;
+                }
+                combinationsList.Add(combination);
+            }
+            return combinationsList;
 
         }
 
@@ -110,7 +125,7 @@ namespace PuppyTroubles
             list.Insert(++indexToMove, t);
         }
 
-        static List<Node> BuildTree(List<int> treatsList)
+        static List<Node> BuildTree(List<int> treatsList, out List<Node> leafList)
         {
             List<Node> tree = new List<Node>();
 
@@ -122,19 +137,6 @@ namespace PuppyTroubles
 
             while (activeNode != null)
             {
-//#if DEBUG
-//                if (loopCount++ > expectedNumberOfLoops)
-//                {
-//                    if (MessageBox.Show("ERROR: POSSIBLE INF LOOP\n\nCONTINUE?", "INF LOOP", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
-//                    {
-//                        loopCount = 0;
-//                    }
-//                    else
-//                    {
-//                        return;
-//                    }
-//                }
-//#endif
                 //build treat list
                 List<int> activeTreats = new List<int>(treatsList);
                 foreach (Node parent in activeNode.GetWalkBack())
@@ -173,6 +175,7 @@ namespace PuppyTroubles
                             {
                                 //we have a leaf
                                 tree.Add(child);
+                                leafList.Add(child);
                             }
                         }
 
